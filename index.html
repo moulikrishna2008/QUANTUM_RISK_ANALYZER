@@ -253,13 +253,36 @@
   /* ── GRID ── */
   .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem}
   .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
-  .grid-4{
+ .grid-4 {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1.5rem;
 }
+
+.card{
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  border-radius:20px;
+  padding:1.75rem;
+  backdrop-filter:blur(20px);
+  position:relative;
+  overflow:hidden;
+  min-width:300px;
+  z-index:20;
+}
+
+.card::before{
+  display:none;
+}
+  
+
+#kpi-grid {
+  width: 100%;
+}
   @media(max-width:1100px){
-    .grid-4{grid-template-columns:repeat(2,1fr)}
+  .grid-4{
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
     .grid-3{grid-template-columns:repeat(2,1fr)}
   }
   @media(max-width:700px){
@@ -277,7 +300,7 @@
     position:relative;overflow:hidden;
     transition:transform 0.4s cubic-bezier(.2,1,.3,1),box-shadow 0.4s,border-color 0.4s;
     opacity:0;transform:translateY(30px);
-  min-width: 260px;
+  min-width: 300px;
 }
   .card.visible{opacity:1;transform:translateY(0)}
   .card::before{
@@ -295,11 +318,12 @@
     font-size:0.68rem;letter-spacing:0.2em;
     color:var(--gray);text-transform:uppercase;margin-bottom:0.75rem;
   }
-  .card-value{
-    font-family:'Orbitron',sans-serif;
-    font-size:2rem;font-weight:700;color:var(--text);
-  white-space: nowrap;
-  }
+  .card-value {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  word-break: break-word;
+}
   .card-value.green{color:var(--accent)}
   .card-value.red{color:var(--danger)}
   .card-value.blue{color:var(--blue)}
@@ -644,7 +668,7 @@ a:hover {
   </div>
 
   <!-- KPI CARDS -->
-  <div class="grid-4" id="kpi-grid">
+  <div class="grid-4" id="kpi-grid" style="width:100%;">
     <div class="card stagger-1" id="kpi-0">
       <div class="card-icon icon-green">📈</div>
       <div class="card-label">Portfolio Value</div>
@@ -669,7 +693,11 @@ a:hover {
       <div class="card-value green" id="kpi-alpha">0.00%</div>
       <div class="card-delta delta-up">↑ vs S&P 500</div>
     </div>
-  </div>
+  <div class="card stagger-5">
+  <div class="card-icon icon-green">📊</div>
+  <div class="card-label">Decision</div>
+  <div class="card-value" id="kpi-decision">--</div>
+</div>
 
   <!-- CHARTS ROW -->
 <div class="section-header" id="analytics"style="margin-top:2.5rem">
@@ -773,6 +801,7 @@ a:hover {
 
   <input id="amount" type="number" placeholder="Amount" 
     style="margin:5px;padding:10px;width:45%;">
+    <input id="userEmail" placeholder="Enter your email">
 
   <button onclick="addStock()" 
     style="padding:10px 20px;margin-top:10px;">
@@ -1180,18 +1209,27 @@ async function runQuantum(e){
     console.log("Backend not working, using fallback");
     data = simulateRisk(); // fallback
   }
+setTimeout(() => {
 
-  setTimeout(() => {
+  overlay.classList.remove('active');
 
+  document.getElementById("kpi-var").innerText = "$" + Math.abs(data.risk);
+  document.getElementById("kpi-alpha").innerText = data.return + "%";
 
-    overlay.classList.remove('active');
+  // 🔥 ADD THIS
+  let decisionEl = document.getElementById("kpi-decision");
 
-    // update values
-    document.getElementById("kpi-var").innerText = "$" + Math.abs(data.risk);
-    document.getElementById("kpi-alpha").innerText = data.return + "%";
-    updateAfterQuantum();
+  decisionEl.innerText = data.decision;
 
-  }, 2000);
+  if (data.decision === "BUY") {
+    decisionEl.style.color = "lime";
+  } else {
+    decisionEl.style.color = "red";
+  }
+
+  updateAfterQuantum();
+
+}, 2000);
 }
 function updateAfterQuantum(){
   animateVal('kpi-portfolio','$2,991,847',()=>document.getElementById('kpi-portfolio').classList.add('counting'));
@@ -1247,21 +1285,27 @@ let portfolio = [];
 async function addStock() {
   let name = document.getElementById("stockName").value;
   let amt = document.getElementById("amount").value;
+  let email = document.getElementById("userEmail").value;
 
-  if (!name || !amt) return;
+  if (!name || !amt || !email) return; // 🔥 email kuda check
 
-  // 🔥 Backend ki data pampadam
   await fetch("http://localhost:3000/add", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ name, amount: amt })
+    body: JSON.stringify({ 
+      name: name, 
+      amount: amt, 
+      email: email   // 🔥 IMPORTANT
+    })
   });
 
-  loadPortfolio(); // refresh list
-document.getElementById("stockName").value = "";
-document.getElementById("amount").value = "";
+  loadPortfolio();
+
+  document.getElementById("stockName").value = "";
+  document.getElementById("amount").value = "";
+  document.getElementById("userEmail").value = ""; // clear email also
 }
 async function loadPortfolio() {
   let res = await fetch("http://localhost:3000/portfolio");
