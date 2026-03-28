@@ -7,6 +7,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
+  body, a, li {
+  font-family: 'JetBrains Mono', monospace !important;
+}
+  .nav-links a {
+  color: var(--gray) !important;
+  text-decoration: none !important;
+}
+.nav-links a:hover {
+  color: var(--accent) !important;
+}
   :root {
     --bg: #0A0A0F;
     --accent: #00FFB2;
@@ -243,7 +253,11 @@
   /* ── GRID ── */
   .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem}
   .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
-  .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
+  .grid-4{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
   @media(max-width:1100px){
     .grid-4{grid-template-columns:repeat(2,1fr)}
     .grid-3{grid-template-columns:repeat(2,1fr)}
@@ -263,7 +277,8 @@
     position:relative;overflow:hidden;
     transition:transform 0.4s cubic-bezier(.2,1,.3,1),box-shadow 0.4s,border-color 0.4s;
     opacity:0;transform:translateY(30px);
-  }
+  min-width: 260px;
+}
   .card.visible{opacity:1;transform:translateY(0)}
   .card::before{
     content:'';position:absolute;inset:0;
@@ -283,6 +298,7 @@
   .card-value{
     font-family:'Orbitron',sans-serif;
     font-size:2rem;font-weight:700;color:var(--text);
+  white-space: nowrap;
   }
   .card-value.green{color:var(--accent)}
   .card-value.red{color:var(--danger)}
@@ -541,6 +557,25 @@
     100%{text-shadow:none}
   }
   .counting{animation:numGlow 0.5s ease}
+  a {
+  color: #888 !important;
+  text-decoration: none !important;
+}
+
+a:visited {
+  color: #888 !important;
+}
+
+a:hover {
+  color: #00FFB2 !important;
+}
+.nav-links a {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  color: var(--gray) !important;
+  text-decoration: none !important;
+}
 </style>
 </head>
 <body>
@@ -579,13 +614,15 @@
 <!-- NAVBAR -->
 <nav id="navbar">
   <div class="nav-logo">⬡ QRA</div>
+
   <ul class="nav-links">
-    <li><a href="#">Dashboard</a></li>
-    <li><a href="#">Portfolio</a></li>
-    <li><a href="#">Signals</a></li>
-    <li><a href="#">Analytics</a></li>
-    <li><a href="#">Risk</a></li>
+    <li><a href="#dashboard">Dashboard</a></li>
+    <li><a href="#portfolio">Portfolio</a></li>
+    <li><a href="#signals">Signals</a></li>
+    <li><a href="#analytics">Analytics</a></li>
+    <li><a href="#risk">Risk</a></li>
   </ul>
+
   <div class="nav-badge">⬤ LIVE SYSTEM</div>
 </nav>
 
@@ -593,7 +630,7 @@
 <div id="main">
 
   <!-- HERO -->
-  <div class="hero" id="hero-section">
+  <div class="hero" id="dashboard">
     <div class="hero-eyebrow"><span class="live-dot"></span>Real-Time Risk Intelligence</div>
     <h1 class="hero-title">Quantum Portfolio Dashboard</h1>
     <p class="hero-sub">AI-driven analytics processing live market data across 40+ asset classes with quantum optimization algorithms.</p>
@@ -635,7 +672,7 @@
   </div>
 
   <!-- CHARTS ROW -->
-  <div class="section-header" style="margin-top:2.5rem">
+<div class="section-header" id="analytics"style="margin-top:2.5rem">
     <div class="section-title">Performance Analytics</div>
     <div class="section-badge">Last 30 days</div>
   </div>
@@ -724,12 +761,11 @@
   </div>
 
   <!-- QUANTUM BUTTON -->
-   <div class="section-header" style="margin-top:2.5rem">
+<div class="section-header" id="signals" style="margin-top:2.5rem">
   <div class="section-title">Portfolio Input</div>
   <div class="section-badge">User Data</div>
 </div>
-
-<div class="card">
+<div class="card" id="portfolio">
   <div class="card-label">Add Your Portfolio</div>
 
   <input id="stockName" placeholder="Stock Name" 
@@ -851,7 +887,7 @@ setTimeout(()=>{
 },2800);
 
 function animateHero(){
-  document.getElementById('hero-section').classList.add('visible');
+  document.getElementById('dashboard').classList.add('visible');
   document.getElementById('ticker-wrap').classList.add('visible');
   // Stagger cards
   setTimeout(()=>{
@@ -1132,42 +1168,30 @@ setTimeout(()=>setGauge(41),1200);
 // ── QUANTUM OPTIMIZATION ──
 async function runQuantum(e){
 
-  // 🔥 Ripple effect (same maintain chey)
-  const btn=document.getElementById('quantum-btn');
-  const r=document.createElement('span');
-  const rect=btn.getBoundingClientRect();
-  const size=Math.max(rect.width,rect.height)*2;
-  r.className='ripple';
-  r.style.cssText=`width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px`;
-  btn.appendChild(r);
-  setTimeout(()=>r.remove(),700);
-
-  // 🔥 Loader show
-  const overlay=document.getElementById('processing-overlay');
+  const overlay = document.getElementById('processing-overlay');
   overlay.classList.add('active');
 
-  // 🔥 Backend call
-  let res = await fetch("http://localhost:3000/risk");
-  let data = await res.json();
+  let data;
 
-  setTimeout(()=>{
+  try {
+    let res = await fetch("http://localhost:3000/risk");
+    data = await res.json();
+  } catch (error) {
+    console.log("Backend not working, using fallback");
+    data = simulateRisk(); // fallback
+  }
+
+  setTimeout(() => {
+
 
     overlay.classList.remove('active');
 
-    // Flash effect
-    const fl=document.getElementById('flash-overlay');
-    fl.classList.add('active');
-    setTimeout(()=>fl.classList.remove('active'),300);
-
-    // 🔥 REAL DATA UPDATE
+    // update values
     document.getElementById("kpi-var").innerText = "$" + Math.abs(data.risk);
     document.getElementById("kpi-alpha").innerText = data.return + "%";
+    updateAfterQuantum();
 
-    // 🔥 Glow effect
-    document.getElementById("kpi-var").classList.add("counting");
-    document.getElementById("kpi-alpha").classList.add("counting");
-
-  },2000);
+  }, 2000);
 }
 function updateAfterQuantum(){
   animateVal('kpi-portfolio','$2,991,847',()=>document.getElementById('kpi-portfolio').classList.add('counting'));
@@ -1236,6 +1260,8 @@ async function addStock() {
   });
 
   loadPortfolio(); // refresh list
+document.getElementById("stockName").value = "";
+document.getElementById("amount").value = "";
 }
 async function loadPortfolio() {
   let res = await fetch("http://localhost:3000/portfolio");
@@ -1264,6 +1290,9 @@ function simulateRisk() {
     risk: worst.toFixed(2),
     return: avg.toFixed(2)
   };
+}
+window.onload = function(){
+  loadPortfolio();
 }
 </script>
 </body>
