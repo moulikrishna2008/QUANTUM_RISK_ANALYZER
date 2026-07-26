@@ -1203,7 +1203,7 @@ async function runQuantum(e){
   let data;
 
   try {
-    let res = await fetch("http://localhost:3000/risk");
+    let res = await fetch("https://quantum-risk-analyzer.onrender.com/add");
     data = await res.json();
   } catch (error) {
     console.log("Backend not working, using fallback");
@@ -1289,7 +1289,7 @@ async function addStock() {
 
   if (!name || !amt || !email) return; // 🔥 email kuda check
 
-  await fetch(" https://quantum-risk-analyzer.onrender.com", {
+  await fetch("https://quantum-risk-analyzer.onrender.com/add", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -1308,7 +1308,7 @@ async function addStock() {
   document.getElementById("userEmail").value = ""; // clear email also
 }
 async function loadPortfolio() {
-  let res = await fetch("http://localhost:3000/portfolio");
+  let res = await fetch("https://quantum-risk-analyzer.onrender.com/portfolio");
   let data = await res.json();
 
   let list = document.getElementById("portfolioList");
