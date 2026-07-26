@@ -1289,7 +1289,7 @@ async function addStock() {
 
   if (!name || !amt || !email) return; // 🔥 email kuda check
 
-  await fetch("http://localhost:3000/add", {
+  await fetch(" https://quantum-risk-analyzer.onrender.com", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
