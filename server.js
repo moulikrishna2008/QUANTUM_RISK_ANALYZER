@@ -26,18 +26,12 @@ const db = admin.firestore();
    GMAIL SETUP
 ========================= */
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
+  service: "gmail",
   auth: {
     user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false
+    pass: process.env.GMAIL_PASS
   }
 });
-
 
 /* =========================
    SEND EMAIL
@@ -46,7 +40,7 @@ const transporter = nodemailer.createTransport({
 async function sendMail(name, amount, decision, email) {
   try {
     await transporter.sendMail({
-      from: "YOUR_GMAIL@gmail.com",
+      from: process.env.GMAIL_USER,
       to: email,
       subject: "Quantum Risk Analyzer",
       html: `
